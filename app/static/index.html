@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!--
+      interactive-widget=resizes-content: the on-screen keyboard shrinks the layout
+      viewport instead of covering it. Without it a sticky element at the bottom edge —
+      the pinboard composer — ends up behind the keyboard.
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1d21" media="(prefers-color-scheme: dark)" />
+    <title>Kehrwoche</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- iOS ignores the manifest for "add to home screen" and needs these two. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Kehrwoche" />
+    <link rel="stylesheet" href="/css/app.css" />
+    <!-- No inline script and no inline style anywhere: the strict CSP forbids both. -->
+    <script type="module" src="/js/main.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

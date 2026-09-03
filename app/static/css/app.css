@@ -1,0 +1,1478 @@
+/*
+ * Mobile first, no framework. Light and dark follow the system setting.
+ * Layout: bottom tab bar on phones, sidebar from tablet width upwards.
+ */
+
+:root {
+  --surface: #ffffff;
+  --surface-sunken: #f2f3f5;
+  --border: #d9dce1;
+  --text: #1c1f23;
+  --text-muted: #5c636d;
+  --accent: #2f6f4f;
+  --accent-contrast: #ffffff;
+  --danger: #a32a2a;
+  --radius: 12px;
+  --space: 1rem;
+  /* Smallest comfortable touch target — 44px, the size of a fingertip. */
+  --tap: 2.75rem;
+  --header-height: 3.5rem;
+  --nav-height: 4rem;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #1a1d21;
+    --surface-sunken: #121417;
+    --border: #333941;
+    --text: #e8eaed;
+    --text-muted: #a2a9b4;
+    --accent: #6fbf94;
+    --accent-contrast: #10231a;
+    --danger: #e08585;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--surface-sunken);
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+}
+
+a {
+  color: inherit;
+}
+
+.app-loading {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  color: var(--text-muted);
+}
+
+.app-layout {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space);
+  height: var(--header-height);
+  padding: 0 var(--space);
+  padding-top: env(safe-area-inset-top);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Anything tappable keeps the minimum target size and reacts without the 300ms delay. */
+.language,
+.bell,
+.nav-item {
+  min-height: var(--tap);
+  touch-action: manipulation;
+}
+
+.language {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  /* 1rem, otherwise iOS zooms into the page when the control gets focus. */
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+.bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: var(--tap);
+  border: 0;
+  background: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.badge {
+  position: absolute;
+  top: 0.1rem;
+  right: 0;
+  min-width: 1.1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1.1rem;
+  text-align: center;
+}
+
+/* Content ----------------------------------------------------------------- */
+
+.app-main {
+  padding: var(--space);
+  padding-bottom: calc(var(--nav-height) + var(--space));
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space);
+}
+
+.muted {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Navigation -------------------------------------------------------------- */
+
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.nav-item.is-active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+/* Desktop: the tab bar becomes a sidebar. ---------------------------------- */
+
+/* Spec: from about 900px the phone layout becomes the desktop one. */
+@media (min-width: 56.25rem) {
+  .app-layout {
+    grid-template-columns: 14rem 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "nav header"
+      "nav main";
+  }
+
+  .app-header {
+    grid-area: header;
+  }
+
+  .app-main {
+    grid-area: main;
+    padding: 1.5rem 2rem;
+    /* Use the window, but stop lines from growing unreadably wide. */
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+  }
+
+  .app-nav {
+    grid-area: nav;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100dvh;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    padding: var(--space) 0.5rem;
+    border-top: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0 0.75rem;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+  }
+
+  .nav-item.is-active {
+    background: var(--surface-sunken);
+  }
+}
+
+/* Forms, cards and lists ---------------------------------------------------- */
+
+.stack {
+  display: grid;
+  gap: var(--space);
+}
+
+.form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.field-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  /* 1rem keeps iOS from zooming in when the field takes focus. */
+  font-size: 1rem;
+}
+
+.field-input.is-invalid {
+  border-color: var(--danger);
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+/* The primary action sits at the end of the form — within reach of the thumb. */
+.form-actions {
+  margin-top: 0.25rem;
+}
+
+.btn {
+  min-height: var(--tap);
+  padding: 0 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.btn--block {
+  display: block;
+  width: 100%;
+}
+
+/* A link that looks like a button still has to centre its label. */
+a.btn {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.btn--secondary {
+  background: var(--surface-sunken);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn--ghost {
+  background: none;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn--danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.segmented {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.2rem;
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+}
+
+.segment {
+  flex: 1;
+  min-height: var(--tap);
+  border: 0;
+  border-radius: calc(var(--radius) - 0.2rem);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.segment.is-active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+/* Members and join code ----------------------------------------------------- */
+
+.member-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--tap);
+}
+
+.member-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-points {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.tag {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: none;
+}
+
+.avatar--large {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.25rem;
+}
+
+.join-code {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  margin: 0.5rem 0;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  word-break: break-word;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Off screen but still selectable — needed by the clipboard fallback. */
+.offscreen {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  opacity: 0;
+}
+
+/* Dialog -------------------------------------------------------------------- */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  background: rgb(0 0 0 / 45%);
+}
+
+.dialog {
+  width: 100%;
+  padding: var(--space);
+  padding-bottom: calc(var(--space) + env(safe-area-inset-bottom));
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+}
+
+.dialog-title {
+  margin-bottom: 0.25rem;
+}
+
+.dialog-actions {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: var(--space);
+}
+
+@media (min-width: 56.25rem) {
+  /* On a wide screen the sheet becomes a centred modal. */
+  .dialog-backdrop {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dialog {
+    max-width: 26rem;
+    border-radius: var(--radius);
+  }
+
+  .dialog-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Forms read better in a column — centred, not stuck to the left edge. */
+  .auth,
+  .stack {
+    max-width: 34rem;
+    margin-inline: auto;
+  }
+
+  .auth {
+    margin-top: 2rem;
+  }
+}
+
+/* Chores -------------------------------------------------------------------- */
+
+.chore-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space);
+}
+
+.chore.is-overdue {
+  border-color: var(--danger);
+}
+
+.chore-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chore-text {
+  display: grid;
+  min-width: 0;
+}
+
+/* The title wraps rather than being cut off: a chore whose name runs long would
+   otherwise take the rhythm and the "your turn" tag over the edge with it, and both
+   are the point of the line. */
+.chore-title {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Rhythm and tag move to the next line as a whole, never broken in the middle. */
+.chore-rhythm,
+.chore-title .tag {
+  white-space: nowrap;
+}
+
+.chore-meta {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.is-overdue .chore-meta {
+  color: var(--danger);
+}
+
+.chore-actions {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* Main action and the caret that unfolds the rest, side by side on one row. */
+.chore-main {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.chore-main .btn {
+  flex: 1;
+}
+
+.chore-more {
+  flex: 0 0 auto;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.chore-more.is-open {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chore-more {
+    transition: none;
+  }
+}
+
+.chore-secondary {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chore-secondary .btn {
+  flex: 1;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* The primary action of a screen: full width, at the end, inside thumb reach. */
+.page-action {
+  position: sticky;
+  bottom: calc(var(--space) / 2);
+  padding-top: 0.5rem;
+}
+
+.link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--tap);
+  padding: 0 var(--space);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--tap);
+}
+
+.check input {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.interval {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.interval-count {
+  max-width: 6rem;
+}
+
+.order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--tap);
+}
+
+.order-position {
+  width: 1.5rem;
+  color: var(--text-muted);
+}
+
+.icon-button {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.icon-button[disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ranking,
+.history-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ranking-row,
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--tap);
+}
+
+.history-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.ranking-place {
+  width: 1.5rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Snackbar ------------------------------------------------------------------ */
+
+.snackbar {
+  position: fixed;
+  left: var(--space);
+  right: var(--space);
+  /* Above the tab bar, still inside thumb reach. */
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 0.5rem);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  padding: 0.75rem var(--space);
+  border-radius: var(--radius);
+  background: var(--text);
+  color: var(--surface);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 25%);
+}
+
+.snackbar-text {
+  flex: 1;
+}
+
+.snackbar-action {
+  min-height: var(--tap);
+  padding: 0 0.5rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+@media (min-width: 56.25rem) {
+  .snackbar {
+    left: auto;
+    right: 2rem;
+    bottom: 2rem;
+    max-width: 28rem;
+  }
+}
+
+/* "Your turn" marker on a chore card. */
+.tag--mine {
+  margin-inline-start: 0.5rem;
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* A person: name plus the login name, which stays visually secondary. */
+.person {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-login {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Shopping list ------------------------------------------------------------- */
+
+.shopping-add {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.shopping-add .field-input {
+  flex: 1;
+}
+
+.suggestions {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.suggestion {
+  min-height: var(--tap);
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.shopping-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.shopping-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* The row itself is the tap target — easy to hit while walking through a shop. */
+.shopping-tick {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.tick {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.shopping-text {
+  display: grid;
+  min-width: 0;
+}
+
+.shopping-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.is-bought .shopping-name {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.icon-button.is-active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.section-title {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* Offline: stated plainly instead of showing up as a failing request later. */
+.offline-banner {
+  margin: 0;
+  padding: 0.5rem var(--space);
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* A row whose tick the server has not confirmed yet. */
+.shopping-item.is-pending {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+/* Household kitty ----------------------------------------------------------- */
+
+.expense-list,
+.period-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.expense-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.expense-text {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+
+.expense-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expense-meta {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.expense-amount {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.expense-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+/* Picking who shares an expense: tapping, not typing. */
+.chip-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  min-height: var(--tap);
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.chip.is-chosen {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+}
+
+.link-button {
+  min-height: var(--tap);
+  margin-top: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.share-preview {
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+}
+
+.share-list,
+.payment-list,
+.balance-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.share-list li,
+.payment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2rem;
+}
+
+.share-amount,
+.payment-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.payment-text {
+  min-width: 0;
+}
+
+.balance {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.4rem 0;
+}
+
+.balance-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.balance-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.balance-amount.is-credit,
+.balance-bar.is-credit {
+  color: var(--accent);
+}
+
+.balance-amount.is-debt,
+.balance-bar.is-debt {
+  color: var(--danger);
+}
+
+/* The bar itself: width comes from the data, colour from credit or debt. */
+.balance-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.balance-bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: currentColor;
+  min-width: 0.15rem;
+}
+
+.period-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.period-text {
+  display: grid;
+  min-width: 0;
+}
+
+/* Pinboard ------------------------------------------------------------------ */
+
+.feed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.feed-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.feed-icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--surface-sunken);
+  font-size: 1.1rem;
+  flex: none;
+}
+
+.feed-text {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.feed-author {
+  font-weight: 600;
+}
+
+.feed-body {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.feed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+/* Like, comments and the link into the module — all thumb sized. */
+.chip-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: var(--tap);
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.chip-action.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.badge--inline {
+  position: static;
+  min-width: 1.25rem;
+}
+
+.feed-comments {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.comment-list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.comment {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.comment-author {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.comment-body {
+  overflow-wrap: anywhere;
+}
+
+.comment-form,
+.feed-compose {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+/*
+ * The composer sits at the top of the pinboard, like the input of the shopping list.
+ *
+ * It used to float above the tab bar, which put it in the thumb zone — but a comment
+ * field further down then ended up underneath it as soon as the keyboard opened. Two
+ * text fields cannot share the same corner of a phone screen, and the pinboard is a
+ * surface for reading first.
+ */
+.feed-compose {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.feed-input {
+  flex: 1;
+  min-height: var(--tap);
+  resize: vertical;
+}
+
+/*
+ * The composer sits at the top of the pinboard, like the input of the shopping list.
+ *
+ * It used to float above the tab bar, which put it in the thumb zone — but a comment
+ * field further down then ended up underneath it as soon as the keyboard opened. Two
+ * text fields cannot share the same corner of a phone screen, and the pinboard is a
+ * surface for reading first.
+ */
+
+/* Notifications ------------------------------------------------------------- */
+
+/* Catches the tap next to the panel; the panel itself hangs below the header. */
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(var(--header-height) + env(safe-area-inset-top));
+  right: 0;
+  left: 0;
+  max-height: 70dvh;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.5rem;
+  padding: var(--space);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.panel-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.panel-head-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.notification-button {
+  display: grid;
+  gap: 0.1rem;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0.5rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.notification.is-unread .notification-button {
+  background: var(--surface-sunken);
+}
+
+.notification-title {
+  font-weight: 600;
+}
+
+.notification.is-unread .notification-title::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: middle;
+}
+
+@media (min-width: 56.25rem) {
+  .notification-panel {
+    left: auto;
+    width: min(24rem, 100%);
+    margin-right: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+}
+
+/* A primary action that stays within reach however long the list gets. */
+.pinned-action {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  z-index: 1;
+  padding: 0.5rem var(--space);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.expenses-view,
+.chores-view {
+  padding-bottom: calc(var(--tap) + 1.5rem);
+}
+
+.link-rows {
+  display: grid;
+}
+
+@media (min-width: 56.25rem) {
+  /*
+   * On a desktop the thumb zone means nothing, and a long list would push the main
+   * action out of sight. It moves to the top of the view instead — `order` reorders
+   * what is drawn without touching the reading order of the document.
+   */
+  .pinned-action {
+    position: static;
+    order: -1;
+    padding: 0;
+    border-top: 0;
+    background: none;
+  }
+
+  .expenses-view,
+  .chores-view {
+    padding-bottom: 0;
+  }
+}
+
+/* Settings ------------------------------------------------------------------ */
+
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* The file input itself is never shown; its label is the button. */
+.avatar-picker {
+  display: inline-grid;
+  place-items: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.household-image {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius);
+  object-fit: cover;
+  flex: none;
+}
+
+img.avatar {
+  object-fit: cover;
+}
+
+.session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: var(--tap);
+}
+
+.session-text {
+  display: grid;
+  min-width: 0;
+}
+
+.session-text > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Administration of the household: the actions sit under the member they belong to. */
+.member {
+  flex-wrap: wrap;
+}
+
+.member-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-basis: 100%;
+  justify-content: flex-end;
+}

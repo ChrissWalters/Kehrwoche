@@ -1,0 +1,108 @@
+name: Release
+
+# A tag is the only trigger: pushing `v1.0.0` builds the image, proves it starts, and
+# publishes it. Nothing is published from a branch, so a release is always a deliberate
+# act — and always from a commit somebody chose.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  # `contents: write` is needed for the draft release, nothing else.
+  contents: write
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/kehrwoche
+
+jobs:
+  release:
+    name: Build, verify and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check that the tag matches the version in the code
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          code=$(python -c "import re,pathlib;print(re.search(r'__version__ = \"([^\"]+)\"', pathlib.Path('app/__init__.py').read_text()).group(1))")
+          if [ "$tag" != "$code" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match __version__ $code" >&2
+            exit 1
+          fi
+          echo "version=$code" >> "$GITHUB_ENV"
+
+      # arm64 is built through emulation on an amd64 runner.
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      # Built first without pushing: an image that cannot start must never be published.
+      - name: Build for verification
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          load: true
+          tags: kehrwoche:verify
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Prove the image comes up and answers
+        run: |
+          # A named volume, not a directory from the runner: the container runs as uid
+          # 10001 and a bind mount would arrive owned by somebody else.
+          docker volume create verify-data
+          docker run -d --name verify -p 8443:8443 -v verify-data:/data kehrwoche:verify
+          for attempt in $(seq 1 30); do
+            if curl -ksf https://127.0.0.1:8443/api/v1/health > /dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl -ksf https://127.0.0.1:8443/api/v1/health
+          # The version the container reports has to be the one that is being released.
+          curl -ksf https://127.0.0.1:8443/api/v1/meta | grep -q "\"version\":\"${{ env.version }}\""
+          docker logs verify
+          docker rm -f verify
+          docker volume rm verify-data
+
+      - name: Sign in to the registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tags for this release
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          # 1.2.3 also moves the 1.2 and 1 tags, so pinning a major gets fixes.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest
+
+      - name: Build and publish
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Draft the release notes
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: ${{ github.ref_name }}
+          body: |
+            Container image: `${{ env.IMAGE }}:${{ env.version }}`
+
+            What changed is in [CHANGELOG.md](CHANGELOG.md).

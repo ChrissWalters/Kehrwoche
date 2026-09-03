@@ -1,0 +1,8 @@
+# The "Sponsor" button on the repository page.
+#
+# Nothing about the software depends on any of this: Kehrwoche is AGPL-3.0, complete, and
+# free of paid tiers by design.
+
+# The handle only — GitHub builds the link itself. A full URL here renders a broken
+# button, because it ends up as https://ko-fi.com/https://ko-fi.com/…
+ko_fi: chrisswalters

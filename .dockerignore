@@ -1,0 +1,33 @@
+# What never belongs in the image: history, tooling, internal papers, local data.
+.git
+.github
+.gitignore
+
+# Internal working documents — they are in the repository, not in the product.
+.intern
+.claude
+
+# Development environment and caches
+.venv
+**/__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+*.egg-info
+build
+dist
+
+# Tests are run in CI, not shipped
+tests
+
+# Local development data: databases, uploads, certificates
+dev.db*
+dev-data
+data
+*.db
+*.db-wal
+*.db-shm
+*.db.backup*
+
+# Compose files describe how to run the image, they are not part of it
+docker-compose*.yml

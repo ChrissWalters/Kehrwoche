@@ -1,0 +1,167 @@
+# Kehrwoche
+#
+# This file works as it stands: SQLite, TLS with a self-signed certificate, one volume.
+# That is the recommended setup for a household, and the one to start from — `docker
+# compose up -d` and nothing else.
+#
+# Everything else is here as a comment, in the place where it belongs. Uncomment what you
+# need, delete what you do not want to read again. The documentation for all of it is in
+# docs/ — configuration.md for the variables, reverse-proxy.md for running it behind a
+# proxy, backup-restore.md for where the data should live.
+
+services:
+  kehrwoche:
+    # Pinning the major version gets fixes and new features without a breaking change.
+    # `:1.0.0` pins exactly one release, `:latest` follows everything including the next
+    # major — fine while you are trying it out, less fine at three in the morning.
+    image: ghcr.io/chrisswalters/kehrwoche:1
+    restart: unless-stopped
+
+    # The image runs as an unprivileged account, uid 10001, and never as root. That is
+    # deliberate, and it is the one thing to know when you mount a directory of your own
+    # below: the container cannot write where it does not own.
+    #
+    # Two ways out, both fine. Either give the directory to that account once —
+    # `chown -R 10001:10001 /srv/appdata/kehrwoche` — or run the container as whoever
+    # owns it already, which is what this line is for. On a NAS, where one account tends
+    # to own every application directory, the second is usually less work.
+    #
+    # Ask the directory itself for the two numbers rather than guessing from names:
+    #
+    #   stat -c '%u:%g' /srv/appdata/kehrwoche      ->  e.g. 1001:998
+    #
+    # user: "1001:998"
+    #
+    # If that says 0:0, the directory was created by Docker rather than by you — that
+    # happens to every path that does not exist yet. Then `chown` is the answer; running
+    # this container as root would give up the one thing the unprivileged account buys.
+
+    environment:
+      # ------------------------------------------------------------------ transport
+      # Three modes, pick one.
+      #
+      # (a) self-signed — the default. The container issues its own certificate on first
+      #     start, valid for ten years, and keeps it in the data volume. Browsers warn
+      #     once per device; confirm it and it stays confirmed. Encryption is real, and
+      #     several browser features (clipboard, install to home screen) need HTTPS at all.
+      TLS_MODE: "self-signed"
+      #     Names and addresses the certificate is issued for. Put in every way you
+      #     actually reach the instance, or the warning comes back on each of them.
+      #     After changing this, delete /data/tls/ and restart.
+      EXTERNAL_HOSTNAMES: "kehrwoche.local,192.168.1.20"
+      #
+      # (b) custom — your own certificate, e.g. from your own certificate authority.
+      #     Mount the files (see volumes below) and point at them. Missing files stop the
+      #     container instead of falling back to something weaker. A replaced certificate
+      #     is picked up automatically.
+      # TLS_MODE: "custom"
+      # TLS_CERT_FILE: "/certs/kehrwoche.crt"
+      # TLS_KEY_FILE: "/certs/kehrwoche.key"
+      #
+      # (c) off — no TLS inside the container, for use behind a reverse proxy that
+      #     terminates it. The internal port becomes 8080, so change the ports mapping
+      #     below. Never expose this mode directly; see docs/reverse-proxy.md.
+      # TLS_MODE: "off"
+      # FORWARDED_ALLOW_IPS: "*"   # or the proxy's address — without it the rate limits
+      #                            # count every visitor as the same one
+
+      # ------------------------------------------------------------------- database
+      # Left out on purpose: the default is SQLite in the data volume, which is what a
+      # household wants. See the `db` service at the bottom for the alternatives.
+      # DATABASE_URL: "mysql+pymysql://kehrwoche:CHANGE-ME@db/kehrwoche"
+      # DATABASE_URL: "postgresql+psycopg://kehrwoche:CHANGE-ME@db/kehrwoche"
+
+      # --------------------------------------------------------------------- access
+      # Leave open until everybody has signed up, then set it to false and restart.
+      # New people then get an account with `kehrwoche-admin user reset-password`.
+      REGISTRATION_OPEN: "true"
+      # Email addresses are a login aid in version 1 and nothing is ever sent, so the
+      # format is not checked by default — "alex@wg" is a perfectly good name in a flat
+      # share. Turn this on for an instance open to more than your household.
+      # EMAIL_VALIDATION: "true"
+      # How long staying signed in lasts.
+      # SESSION_MAX_AGE_DAYS: "30"
+      # LOG_LEVEL: "info"
+
+    ports:
+      # host:container. With TLS_MODE=off the right-hand side is 8080.
+      - "8443:8443"
+
+    volumes:
+      # Everything that must survive an update: the SQLite database, the uploaded
+      # pictures (media/) and the self-signed certificate (tls/).
+      #
+      # A named volume is a directory on the host like any other — Docker just picks the
+      # place and the owner. `docker compose down` leaves it alone; only `down -v` or
+      # `docker volume rm` remove it.
+      #
+      # A path of your own is the better choice as soon as backups matter: a named volume
+      # lands under /var/lib/docker, which on a NAS is often the system disk and outside
+      # whatever snapshots the data pool. Two conditions, then it is just as safe:
+      #
+      #   * The owner has to match: either `chown -R 10001:10001` on the directory, or
+      #     the `user:` line above. Skip both and the instance starts, shows everything,
+      #     and fails at the first write.
+      #   * A local filesystem. SQLite on an NFS or SMB share corrupts sooner or later;
+      #     its locking does not survive network file systems.
+      #
+      #   - /srv/appdata/kehrwoche:/data
+      #
+      - kehrwoche-data:/data
+
+      # Your own language files, or overrides for single words. Read-only is enough:
+      # the server merges them over the bundled catalogues at start-up and offers every
+      # language it finds. See docs/configuration.md.
+      # - ./locales-extra:/app/locales-extra:ro
+
+      # Only for TLS_MODE=custom.
+      # - ./certs:/certs:ro
+
+    # Optional: with an external database, wait for it to be healthy.
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  # ---------------------------------------------------------------------------------
+  # An external database is optional. SQLite is not a compromise here — one household
+  # writing occasionally is far inside what one file and one process do comfortably, and
+  # it is the only option with a backup command built into the application.
+  #
+  # Use a server database if you already run one, or if one instance serves many
+  # households. Both are tested on every change; PostgreSQL is the stronger engine,
+  # MariaDB the more familiar one on a NAS. Switching is one line — `DATABASE_URL` above.
+  #
+  # db:
+  #   image: mariadb:11
+  #   restart: unless-stopped
+  #   environment:
+  #     MARIADB_DATABASE: kehrwoche
+  #     MARIADB_USER: kehrwoche
+  #     MARIADB_PASSWORD: CHANGE-ME
+  #     MARIADB_RANDOM_ROOT_PASSWORD: "1"
+  #   volumes:
+  #     - db-data:/var/lib/mysql
+  #   healthcheck:
+  #     test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+  #     interval: 10s
+  #     retries: 10
+  #
+  # …or PostgreSQL instead:
+  #
+  # db:
+  #   image: postgres:16
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: kehrwoche
+  #     POSTGRES_USER: kehrwoche
+  #     POSTGRES_PASSWORD: CHANGE-ME
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U kehrwoche"]
+  #     interval: 10s
+  #     retries: 10
+
+volumes:
+  kehrwoche-data:
+  # db-data:
