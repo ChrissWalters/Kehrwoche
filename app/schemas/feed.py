@@ -12,7 +12,7 @@ BODY_MAX_LENGTH = 2000
 
 
 class PostRequest(BaseModel):
-    """A post is plain text — no uploads in V1."""
+    """A post is plain text — no uploads."""
 
     body: str = Field(min_length=1, max_length=BODY_MAX_LENGTH)
 

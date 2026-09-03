@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     port: int | None = None
     session_max_age_days: int = 30
     registration_open: bool = True
-    #: In V1 the address is only a login name and no mail is ever sent, so anything
+    #: The address is only a login name and no mail is ever sent, so anything
     #: non-empty is accepted by default — handy for home networks ("alex@wg").
     #: Instances open to the internet can switch the format check on.
     email_validation: bool = False

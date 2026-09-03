@@ -92,7 +92,7 @@ An instance reachable from the internet should not leave registration open.
 
 ## Email addresses
 
-In version 1 an email address is a login aid and nothing else: no mail is ever sent, there
+An email address is a login aid and nothing else: no mail is ever sent, there
 is no password reset by email, and nothing is verified. That is why `EMAIL_VALIDATION` is
 off by default — `alex@wg` is a perfectly good identifier in a flat share. Turn it on if
 your instance is open to more than the people you live with and you want the format

@@ -41,7 +41,7 @@ Two possible reasons.
 **With HTTPS, in Firefox for Android**, the shortcut may still open in a tab. Firefox
 installs a site as an app only when it considers it fully installable, and its criteria
 include a *service worker* — a piece of code that makes a site work offline. Kehrwoche
-deliberately does not ship one in version 1: an offline mode that quietly desynchronises a
+deliberately does not ship one: an offline mode that quietly desynchronises a
 shared shopping list is worse than no offline mode. It is planned for a later version.
 
 Chromium-based browsers (Chrome, Edge, Brave, Vivaldi) and Safari install it from the
@@ -49,7 +49,7 @@ manifest alone and open it in its own window.
 
 ## I forgot my password
 
-There is no reset by email — version 1 never sends mail, and an address in a profile is
+There is no reset by email — Kehrwoche never sends mail, and an address in a profile is
 just a login aid. Somebody with access to the machine resets it:
 
 ```bash
@@ -133,7 +133,7 @@ Adding a third language needs no rebuild: drop a JSON file into a folder mounted
 Yes — the browser client uses the same API as anything else would, and the instance serves
 its own OpenAPI document at `/api/v1/openapi.json` for signed-in admins. Authentication is
 the session cookie plus the CSRF header for anything that changes data. A proper access
-token per integration is planned for version 2.
+token per integration is planned for a future version.
 
 ## Is there an app for iOS or Android?
 

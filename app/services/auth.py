@@ -27,7 +27,7 @@ from app.security import (
 USER_AGENT_MAX_LENGTH = 255
 
 #: Deliberately loose: "something@something" without spaces. The address is optional and
-#: nothing is sent to it in V1, so the check only runs when the operator asks for it via
+#: nothing is sent to it, so the check only runs when the operator asks for it via
 #: ``EMAIL_VALIDATION``.
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+$")
 

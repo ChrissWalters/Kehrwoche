@@ -29,8 +29,8 @@ class User(Entity):
     #: Login name, freely chosen and visible to the household — never an identifier
     #: that has to stay private.
     username: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
-    #: Optional and private: nothing is sent anywhere in V1, it prepares the password
-    #: reset by mail planned for V2.
+    #: Optional and private: nothing is sent anywhere, it prepares the password
+    #: reset by mail, should one ever be added.
     email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, default=None)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     first_name: Mapped[str] = mapped_column(String(80), nullable=False)
