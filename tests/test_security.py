@@ -175,7 +175,7 @@ async def test_the_policy_leaves_no_room_for_inline_code(client: AsyncClient) ->
 
 
 async def test_the_openapi_document_is_for_admins(client: AsyncClient, app: FastAPI) -> None:
-    """The specification limits the reference to signed-in admins."""
+    """The reference is for admins of a household, not for the open internet."""
     assert (await client.get(f"{API_PREFIX}/openapi.json")).status_code == 401
 
     await sign_up(client)

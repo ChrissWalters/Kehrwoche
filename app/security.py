@@ -28,7 +28,8 @@ from fastapi import Response
 from app.config import Settings, TlsMode
 from app.errors import AppError, ErrorCode
 
-#: Minimum password length required by the specification.
+#: Shortest password accepted. Long enough to matter, short enough that people do
+#: not write it on the fridge.
 MIN_PASSWORD_LENGTH = 10
 
 SESSION_COOKIE_NAME = "kehrwoche_session"
@@ -317,7 +318,7 @@ def session_cookie_removal_header(settings: Settings) -> dict[str, str]:
 TLS_DIR_NAME = "tls"
 CERTIFICATE_NAME = "kehrwoche.crt"
 PRIVATE_KEY_NAME = "kehrwoche.key"
-#: Ten years, as the specification prescribes: the warning is confirmed once per device,
+#: Ten years: the warning is confirmed once per device,
 #: and nobody wants to repeat that every year in their own home network.
 CERTIFICATE_DAYS = 3650
 #: How often the custom certificate is checked for a replacement.

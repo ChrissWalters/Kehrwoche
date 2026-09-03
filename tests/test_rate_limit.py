@@ -115,7 +115,8 @@ def test_keys_are_independent(limiter: RateLimiter) -> None:
     limiter.check("two")
 
 
-def test_production_login_limit_matches_the_specification() -> None:
+def test_the_shipped_login_limit_is_the_intended_one() -> None:
+    """Five tries, then a pause that grows — and a ceiling, so nobody is locked out."""
     assert LOGIN_RATE_LIMIT.max_attempts == 5
     assert LOGIN_RATE_LIMIT.block_seconds < LOGIN_RATE_LIMIT.max_block_seconds
 

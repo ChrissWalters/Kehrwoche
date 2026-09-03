@@ -1,8 +1,9 @@
 """Chores: rotation, completion and the undo window.
 
-The six steps of a completion are prescribed by the specification and all happen in one
-transaction: log the completion, award the points, hand the chore on, work out the next
-due date, write the feed event, tell the next person.
+A completion is six steps in one transaction: log the completion, award the points,
+hand the chore on, work out the next due date, write the feed event, tell the next
+person. All or none — a chore that is booked but hands itself to nobody is worse
+than one that was never booked.
 """
 
 from __future__ import annotations

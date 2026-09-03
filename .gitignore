@@ -219,10 +219,9 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Kehrwoche
-# Working papers of the development repository: specification, plan, progress notes.
-# They are not user documentation and do not belong in the published copy.
-# No trailing slash on purpose: that form only matches real directories, and these
-# two are worth ignoring even when they are a symlink into another checkout.
+# Local working directories. They are not part of the product and are never published.
+# No trailing slash on purpose: that form only matches real directories, and these two
+# are worth ignoring even when they are a symlink into another checkout.
 /.intern
 /.claude
 /data/

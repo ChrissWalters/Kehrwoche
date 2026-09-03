@@ -118,7 +118,7 @@ def _erase_identity(db: DbSession, user: User) -> None:
 def delete_account(db: DbSession, user: User, password: str, settings: Settings) -> None:
     """Give up the account: anonymise, do not remove.
 
-    The specification is explicit about this — completions, expenses and feed entries of
+    Completions, expenses and feed entries of
     the household have to stay consistent, so the row survives as "former member" while
     everything personal about it goes away. Access ends immediately in every case:
     sessions, password, address and picture are gone before this returns.

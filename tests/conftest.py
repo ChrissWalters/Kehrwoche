@@ -2,7 +2,7 @@
 
 By default every test runs against its own SQLite in-memory database. Setting
 ``TEST_DATABASE_URL`` points the same suite at MariaDB or PostgreSQL — that is how CI
-proves the dialect independence promised in the specification.
+proves that the schema stays independent of the dialect.
 """
 
 from __future__ import annotations

@@ -393,7 +393,7 @@ def balance_map(db: DbSession, household: Household) -> dict[int, int]:
 def settlement_payments(balances_by_user: dict[int, int]) -> list[tuple[int, int, int]]:
     """The payments that bring every balance to zero: who pays whom how much.
 
-    Greedy, as the specification prescribes: the largest debtor pays the largest
+    Greedy: the largest debtor pays the largest
     creditor as much as possible. Every payment settles at least one of the two, so
     there are never more than n−1 payments for n people. Ties are broken by the member
     id, which makes the proposal reproducible — the same books always yield the same

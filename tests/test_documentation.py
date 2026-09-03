@@ -116,8 +116,8 @@ def test_the_release_workflow_publishes_only_from_a_tag() -> None:
 #: at the forge catches known token formats; it knows nothing about a database somebody
 #: dropped in by accident, and that is the likelier mistake here.
 FORBIDDEN = (
-    ".intern",  # specification and plan — working documents
-    ".claude",  # working instructions and progress notes
+    ".intern",  # local working directories, never part of the product
+    ".claude",
     ".venv",
     "dev-data",
     ".env",

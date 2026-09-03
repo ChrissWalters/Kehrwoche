@@ -1,8 +1,8 @@
 /**
  * The chore list — the screen people open most often.
  *
- * One tap books a chore as done and a snackbar offers to take it back; that is the rule
- * from the specification, no confirmation dialog for an everyday action.
+ * One tap books a chore as done and a snackbar offers to take it back — no
+ * confirmation dialog for something people do every day.
  */
 
 import { h, reactive, watch } from "../../../vendor/vue.esm-browser.prod.js";

@@ -227,7 +227,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
         title="Kehrwoche",
         version=__version__,
-        # Both are served by our own routes below, because the specification limits the
+        # Both are served by our own routes below, because the reference is limited to the
         # reference to signed-in admins.
         openapi_url=None,
         docs_url=None,

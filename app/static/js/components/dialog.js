@@ -1,7 +1,7 @@
 /**
  * Confirmation dialog — reserved for destructive actions (delete, archive, leave).
  *
- * Everything else follows the one-tap-plus-undo rule from the specification. On a phone
+ * Everything else follows the one-tap-plus-undo rule. On a phone
  * it fills the screen from the bottom, on a wide screen it becomes a centred modal.
  */
 

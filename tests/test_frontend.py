@@ -166,7 +166,7 @@ def test_every_feed_event_type_has_a_text_in_both_languages() -> None:
 
 
 def test_every_feed_event_type_is_actually_emitted() -> None:
-    """The specification names the events; this proves the code still writes them."""
+    """Every type the pinboard can render has to be one the code still writes."""
     from app.models import FeedEventType
 
     services = Path("app/services")

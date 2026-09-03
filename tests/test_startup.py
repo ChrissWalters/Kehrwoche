@@ -135,30 +135,12 @@ def test_an_unknown_command_is_refused(tmp_path: Path, monkeypatch: pytest.Monke
 # --- What ships -----------------------------------------------------------------------
 
 
-def test_the_image_leaves_internal_papers_outside() -> None:
-    """`.intern/` and `.claude/` are working documents of this repository, not product."""
+def test_the_image_stays_free_of_local_clutter() -> None:
+    """The image is the product; a checkout holds a good deal that is not."""
     ignored = Path(".dockerignore").read_text(encoding="utf-8")
 
     for entry in (".intern", ".claude", ".git", "tests", "dev-data", ".venv"):
         assert entry in ignored, entry
-
-
-#: The specification is a working document and is deliberately not published, so this
-#: check only has something to compare against on a machine that has it.
-SPECIFICATION = Path(".intern/spec.md")
-
-
-@pytest.mark.skipif(not SPECIFICATION.is_file(), reason="the specification is not published")
-def test_the_compose_file_matches_the_specification() -> None:
-    """The specification prints the file; ours has to be that file."""
-    import re
-
-    blocks = re.findall(r"```yaml\n(.*?)```", SPECIFICATION.read_text(encoding="utf-8"), re.S)
-    shipped = Path("docker-compose.yml").read_text(encoding="utf-8").strip()
-
-    assert any(block.strip() == shipped for block in blocks), (
-        "docker-compose.yml differs from the version printed in the specification"
-    )
 
 
 def test_the_compose_file_starts_a_working_instance_unedited() -> None:

@@ -33,7 +33,7 @@ the checksum in the test and the entry in `README.md`.
 
 ### Why the full build
 
-The specification names this file. It contains the template compiler, which compiles
+This is the file to take. The others contain the template compiler, which compiles
 through `Function("Vue", code)` — and that needs `'unsafe-eval'` in the Content Security
 Policy. Kehrwoche therefore writes **all components as render functions** (`h(...)`), so
 that code path is never reached and the strict CSP from AP29 (`default-src 'self'`) holds.
