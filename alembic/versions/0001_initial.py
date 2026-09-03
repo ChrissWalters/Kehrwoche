@@ -414,8 +414,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     # Dropping a table removes its indexes as well. Dropping them explicitly first
-    # fails on MariaDB, which requires an index to stay in place while a foreign key
-    # still references the column.
+    # fails on dialects that keep an index alive as long as a foreign key still
+    # references the column, so the tables go first.
     op.drop_table("expense_shares")
     op.drop_table("settlement_payments")
     op.drop_table("likes")

@@ -57,8 +57,8 @@ it, this is the minimum:
    `kehrwoche-admin user reset-password`, or open it only while people sign up.
 3. **Keep the image current.** Updates are a pull and a restart; migrations run on their
    own at start-up.
-4. **Back the data up** — `kehrwoche-admin backup <path>` for SQLite, the usual dump
-   tools for MariaDB or PostgreSQL — and check that a backup can be restored.
+4. **Back the data up** — `kehrwoche-admin backup <path>` for SQLite, `pg_dump` for
+   PostgreSQL — and check that a backup can be restored.
 5. **Let the proxy pass the real client address** (`X-Forwarded-For`) *and* set
    `FORWARDED_ALLOW_IPS` on the container so the header is believed — by default only
    `127.0.0.1` is trusted, which a proxy in a neighbouring container is not. Sending the

@@ -380,8 +380,8 @@ async def test_the_state_marker_moves_when_the_household_is_renamed(
 ) -> None:
     """A rename keeps the row count, so only the timestamp can tell the marker apart.
 
-    The clock is moved by hand: MariaDB stores whole seconds, where founding and
-    renaming fall into the same second. Such collisions are accepted in production
+    The clock is moved by hand: at second resolution, founding and renaming fall into
+    the same second. Such collisions are accepted in production
     (see the synchronisation chapter) — a test must not depend on them.
     """
     household = db_session.scalar(select(Household))

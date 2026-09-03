@@ -150,15 +150,14 @@ def backup_database(settings: Settings, target: Path) -> Path:
     """Copy a running SQLite database consistently, without stopping the server.
 
     Uses SQLite's own backup interface, which takes care of pages still sitting in the
-    write-ahead log — a plain file copy can miss exactly those. For MariaDB or
-    PostgreSQL there is nothing sensible to do from here, so it says which tool to use
-    instead of writing a file that only looks like a backup.
+    write-ahead log — a plain file copy can miss exactly those. For PostgreSQL there is
+    nothing sensible to do from here, so it says which tool to use instead of writing a
+    file that only looks like a backup.
     """
     if not is_sqlite(settings.database_url):
         raise AdminError(
             "This instance does not use SQLite. Please back the database up with the "
-            "tool of your database: mariadb-dump for MariaDB/MySQL, pg_dump for "
-            "PostgreSQL."
+            "tool of your database — pg_dump for PostgreSQL."
         )
 
     source = sqlite_file(settings.database_url)

@@ -565,7 +565,7 @@ async def test_the_change_marker_moves_with_every_change(
     after_create = household_state(db_session, household, user)["expenses"]
     assert empty != after_create
 
-    # Age the row so the comparison holds on MariaDB as well, where a timestamp only
+    # Age the row so the comparison holds at second resolution too, where a timestamp only
     # has second resolution and two calls in the same second would look identical.
     stored = db_session.get(Expense, expense["id"])
     assert stored is not None

@@ -27,7 +27,7 @@ def _clear_engine_cache() -> None:
 
 def test_is_sqlite_recognises_the_backend() -> None:
     assert is_sqlite("sqlite:////data/kehrwoche.db")
-    assert not is_sqlite("mysql+pymysql://user:pw@db/kehrwoche")
+    assert not is_sqlite("postgresql+psycopg://user:pw@db/kehrwoche")
     assert not is_sqlite("postgresql+psycopg://user:pw@db/kehrwoche")
 
 

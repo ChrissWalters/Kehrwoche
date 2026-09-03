@@ -81,8 +81,10 @@ does rather than what changed.
 ### Operation
 
 * One container: FastAPI, the browser client, migrations and the admin CLI.
-* SQLite by default, MariaDB/MySQL and PostgreSQL supported by changing `DATABASE_URL`
-  alone. All three are tested on every change.
+* SQLite by default, PostgreSQL by changing `DATABASE_URL` alone. Both are tested on
+  every change. PostgreSQL is the only external database on purpose: it applies
+  migrations in a transaction and rolls a failed one back by itself, so no supported
+  database can be left half-migrated.
 * **The container checks itself before it serves anything**: configuration, database,
   whether the data directory can be written to, and whether the schema matches the image
   — in that order, stopping at the first thing that is not right, with the reason in
@@ -90,9 +92,8 @@ does rather than what changed.
   start instead of being guessed at.
 * **On SQLite the database is copied before every migration**, into `backups/` inside the
   data volume, and put back if the migration fails; the three newest copies are kept.
-  With MariaDB or PostgreSQL the container cannot copy a database it does not own, so it
-  names the dump command in the log instead — and warns that MariaDB does not roll a
-  failed migration back by itself.
+  With PostgreSQL the container cannot copy a database it does not own, so it names the
+  dump command in the log instead — the database itself rolls a failed migration back.
 * Updating is a pull and a restart: migrations run at start-up, and the server starts
   last, so a failed update cannot have changed anything.
 * TLS from the container with a self-signed certificate (generated once, ten years, for

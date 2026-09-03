@@ -18,7 +18,7 @@ def string_enum(enum_type: type[StrEnum], name: str, length: int = 16) -> Enum:
 
     Without ``values_callable`` SQLAlchemy persists the member *name* (``WG``), and
     ``native_enum=False`` keeps the column a plain string with a check constraint —
-    the same shape on SQLite, MariaDB and PostgreSQL.
+    the same shape on SQLite and PostgreSQL.
     """
     return Enum(
         enum_type,
@@ -37,13 +37,13 @@ def utcnow() -> datetime:
 class UtcDateTime(TypeDecorator[datetime]):
     """Timezone-aware timestamps on every dialect.
 
-    SQLite and MySQL drop the offset when storing a value, so the value would come back
-    naive and comparisons against ``datetime.now(UTC)`` would fail. This decorator
-    normalises to UTC on the way in and re-attaches UTC on the way out.
+    SQLite drops the offset when storing a value, so it would come back naive and
+    comparisons against ``datetime.now(UTC)`` would fail. This decorator normalises to
+    UTC on the way in and re-attaches UTC on the way out.
 
-    Precision is whole seconds on MariaDB/MySQL, which store ``DATETIME`` without
-    fractions unless asked otherwise. Nothing in Kehrwoche depends on sub-second
-    resolution — orderings that could tie use the id as a tie breaker.
+    Nothing in Kehrwoche depends on sub-second resolution: orderings that could tie use
+    the id as a tie breaker. That keeps the behaviour the same whatever a dialect
+    stores.
     """
 
     impl = DateTime(timezone=True)

@@ -15,9 +15,9 @@ That covers exactly one accident, the one an update can cause. It is not a backu
 not taken on a schedule, it does not leave the machine, and it does not include the
 pictures. Everything below still applies.
 
-With MariaDB or PostgreSQL there is no such copy — the container cannot dump a database
-it does not own. Before updating such an instance, take a dump yourself; the container
-says so in the log, but it will not stop you.
+With PostgreSQL there is no such copy — the container cannot dump a database it does not
+own. It does not need one either: PostgreSQL applies all migrations in a transaction and
+rolls a failed one back by itself. A dump before a major update is still good practice.
 
 ## What has to be saved
 
@@ -29,7 +29,7 @@ Everything lives in the data volume, `/data` inside the container:
 | `/data/media/` | Avatars and household pictures | **No.** |
 | `/data/tls/` | The self-signed certificate | Yes — but a new one means a new browser warning on every device. |
 
-With MariaDB or PostgreSQL the database is in the database container instead, and
+With PostgreSQL the database is in the database container instead, and
 `/data/media/` still matters.
 
 ## SQLite
@@ -61,12 +61,6 @@ docker compose cp kehrwoche:/data/media ./kehrwoche-backups/media
 Point your existing backup software at the volume afterwards, and prune old files — the
 command keeps every one it writes.
 
-## MariaDB
-
-```bash
-docker compose exec db mariadb-dump -u kehrwoche -p kehrwoche > kehrwoche.sql
-```
-
 ## PostgreSQL
 
 ```bash
@@ -97,12 +91,6 @@ outside, and the application does not run as root — it runs as uid 10001. With
 `chown` the instance starts, shows everything, and fails the moment somebody ticks a chore
 off, because the database file is readable but not writable. See
 [the note on file ownership](#a-note-on-file-ownership).
-
-**MariaDB:**
-
-```bash
-docker compose exec -T db mariadb -u kehrwoche -p kehrwoche < kehrwoche.sql
-```
 
 **PostgreSQL:**
 

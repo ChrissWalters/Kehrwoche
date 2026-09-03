@@ -67,8 +67,7 @@ services:
 
       # ------------------------------------------------------------------- database
       # Left out on purpose: the default is SQLite in the data volume, which is what a
-      # household wants. See the `db` service at the bottom for the alternatives.
-      # DATABASE_URL: "mysql+pymysql://kehrwoche:CHANGE-ME@db/kehrwoche"
+      # household wants. See the `db` service at the bottom for the alternative.
       # DATABASE_URL: "postgresql+psycopg://kehrwoche:CHANGE-ME@db/kehrwoche"
 
       # --------------------------------------------------------------------- access
@@ -128,25 +127,10 @@ services:
   # it is the only option with a backup command built into the application.
   #
   # Use a server database if you already run one, or if one instance serves many
-  # households. Both are tested on every change; PostgreSQL is the stronger engine,
-  # MariaDB the more familiar one on a NAS. Switching is one line — `DATABASE_URL` above.
-  #
-  # db:
-  #   image: mariadb:11
-  #   restart: unless-stopped
-  #   environment:
-  #     MARIADB_DATABASE: kehrwoche
-  #     MARIADB_USER: kehrwoche
-  #     MARIADB_PASSWORD: CHANGE-ME
-  #     MARIADB_RANDOM_ROOT_PASSWORD: "1"
-  #   volumes:
-  #     - db-data:/var/lib/mysql
-  #   healthcheck:
-  #     test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-  #     interval: 10s
-  #     retries: 10
-  #
-  # …or PostgreSQL instead:
+  # households. PostgreSQL is the only external database supported, and on purpose:
+  # it applies migrations in a transaction and rolls a failed one back by itself, so
+  # an update cannot leave the schema half-changed. Switching is one line —
+  # `DATABASE_URL` above.
   #
   # db:
   #   image: postgres:16

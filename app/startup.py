@@ -49,11 +49,8 @@ BACKUP_DIR_NAME = "backups"
 #: volume quietly filling up with copies of a database nobody will ever read again.
 BACKUPS_KEPT = 3
 
-#: The dump command to recommend, by dialect — the application cannot run either itself.
-DUMP_COMMANDS = {
-    "mysql": "mariadb-dump -u <user> -p <database> > kehrwoche.sql",
-    "postgresql": "pg_dump -U <user> <database> > kehrwoche.sql",
-}
+#: The dump command to recommend — the application cannot run it itself.
+DUMP_COMMANDS = {"postgresql": "pg_dump -U <user> <database> > kehrwoche.sql"}
 
 
 def wait_for_database(
@@ -239,12 +236,6 @@ def _warn_about_external_database(settings: Settings, current: str | None, head:
         head,
         DUMP_COMMANDS.get(dialect, "the dump tool of your database"),
     )
-    if dialect == "mysql":
-        logger.warning(
-            "MariaDB/MySQL does not roll a failed migration back: it applies each step "
-            "as it goes. If this one fails, the schema may sit between two versions and "
-            "a dump is the only way back."
-        )
 
 
 def run_migrations(settings: Settings) -> None:

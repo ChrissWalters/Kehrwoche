@@ -32,33 +32,13 @@ jobs:
       - name: Test
         run: pytest -q
 
-  databases:
-    name: Migrations and tests (${{ matrix.database }})
+  # SQLite is covered by the job above. This one proves the schema still works on a
+  # server database — the whole reason no raw SQL is allowed anywhere in the project.
+  postgresql:
+    name: Migrations and tests (PostgreSQL)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - database: mariadb
-            url: mysql+pymysql://kehrwoche:kehrwoche@127.0.0.1:3306/kehrwoche
-          - database: postgresql
-            url: postgresql+psycopg://kehrwoche:kehrwoche@127.0.0.1:5432/kehrwoche
 
     services:
-      mariadb:
-        image: mariadb:11
-        env:
-          MARIADB_DATABASE: kehrwoche
-          MARIADB_USER: kehrwoche
-          MARIADB_PASSWORD: kehrwoche
-          MARIADB_RANDOM_ROOT_PASSWORD: "1"
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="healthcheck.sh --connect --innodb_initialized"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
       postgres:
         image: postgres:16
         env:
@@ -74,7 +54,7 @@ jobs:
           --health-retries=10
 
     env:
-      DATABASE_URL: ${{ matrix.url }}
+      DATABASE_URL: postgresql+psycopg://kehrwoche:kehrwoche@127.0.0.1:5432/kehrwoche
 
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +76,7 @@ jobs:
 
       # `alembic check` runs in the SQLite job only: reflection of JSON and boolean
       # columns differs per dialect, so it would report differences that are not real.
-      - name: Smoke test the full suite against ${{ matrix.database }}
+      - name: Smoke test the full suite against PostgreSQL
         env:
-          TEST_DATABASE_URL: ${{ matrix.url }}
+          TEST_DATABASE_URL: postgresql+psycopg://kehrwoche:kehrwoche@127.0.0.1:5432/kehrwoche
         run: pytest -q

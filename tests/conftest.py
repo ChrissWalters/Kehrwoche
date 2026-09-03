@@ -1,7 +1,7 @@
 """Shared fixtures: a fresh database per test and a client bound to it.
 
 By default every test runs against its own SQLite in-memory database. Setting
-``TEST_DATABASE_URL`` points the same suite at MariaDB or PostgreSQL — that is how CI
+``TEST_DATABASE_URL`` points the same suite at PostgreSQL — that is how CI
 proves that the schema stays independent of the dialect.
 """
 

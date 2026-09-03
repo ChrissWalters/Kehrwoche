@@ -37,9 +37,9 @@ def _marker(db: DbSession, *conditions: tuple[type[Entity], object]) -> str:
         count, latest = db.execute(
             select(func.count(model.id), func.max(model.updated_at)).where(condition)
         ).one()
-        # Keep whatever resolution the database offers: SQLite and PostgreSQL store
-        # microseconds, MariaDB whole seconds. Rounding to seconds everywhere would
-        # throw away precision that is there for free.
+        # Keep whatever resolution the database offers rather than rounding to a
+        # lowest common denominator: both supported dialects store microseconds, and
+        # throwing that away would make two changes in one second indistinguishable.
         stamp = f"{latest.timestamp():.6f}" if isinstance(latest, datetime) else "0"
         parts.append(f"{count}.{stamp}")
     return "-".join(parts) or EMPTY

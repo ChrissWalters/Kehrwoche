@@ -262,7 +262,7 @@ async def test_rotation_over_three_members_and_four_completions(
 async def test_completing_a_fixed_chore_keeps_the_grid(
     founder: AsyncClient, db_session: Session
 ) -> None:
-    # Whole seconds: MariaDB stores DATETIME without fractions, so a value with
+    # Whole seconds: a stored timestamp may carry no fractions, so a value with
     # microseconds would come back rounded and the comparison would be about storage
     # precision rather than about the rotation.
     due = (utcnow() - timedelta(days=2)).replace(microsecond=0)
@@ -840,9 +840,9 @@ async def test_the_switch_leaves_the_turn_where_it_was(
     # Everything else is untouched: the work counts, the points are Alex's, time moves on.
     db_session.expire_all()
     assert db_session.get(User, alex).points == 2
-    # Deliberately not "the due date differs from the one it was created with": MariaDB
-    # stores whole seconds, so a chore created and completed inside the same second
-    # carries the identical value and the comparison would say nothing. What the rhythm
+    # Deliberately not "the due date differs from the one it was created with": at
+    # second resolution a chore created and completed inside the same second carries
+    # the identical value, and the comparison would say nothing. What the rhythm
     # actually promises is this — the work is logged, and the chore comes round again.
     assert after["last_done_at"] is not None
     assert datetime.fromisoformat(after["due_at"]) > utcnow(), "the chore is due again later"

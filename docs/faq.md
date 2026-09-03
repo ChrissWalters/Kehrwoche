@@ -115,8 +115,8 @@ another container.
 
 A household with SQLite is not a load problem: a few dozen people writing occasionally is
 comfortably within what one file and one process do. If you run many households on one
-instance, or you like proper concurrent writes, switch `DATABASE_URL` to MariaDB or
-PostgreSQL — no other change is needed.
+instance, or you like proper concurrent writes, switch `DATABASE_URL` to PostgreSQL —
+no other change is needed.
 
 ## Can I use it in another language?
 

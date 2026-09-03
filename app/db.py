@@ -1,7 +1,7 @@
 """Database engine, session factory and the request-scoped session dependency.
 
-The engine is built solely from ``DATABASE_URL`` so that SQLite, MariaDB/MySQL and
-PostgreSQL are interchangeable without code changes. Anything dialect specific lives
+The engine is built solely from ``DATABASE_URL`` so that SQLite and PostgreSQL are
+interchangeable without code changes. Anything dialect specific lives
 here — models, services and routers stay dialect agnostic.
 """
 
@@ -18,8 +18,8 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import Settings, get_settings
 
-#: Explicit constraint names keep migrations portable: SQLite and MariaDB otherwise
-#: invent different names, which makes a later ``DROP CONSTRAINT`` unpredictable.
+#: Explicit constraint names keep migrations portable: left to itself every dialect
+#: invents its own, which makes a later ``DROP CONSTRAINT`` unpredictable.
 NAMING_CONVENTION = {
     "ix": "ix_%(table_name)s_%(column_0_N_name)s",
     "uq": "uq_%(table_name)s_%(column_0_N_name)s",
@@ -28,10 +28,9 @@ NAMING_CONVENTION = {
     "pk": "pk_%(table_name)s",
 }
 
-#: Isolation level for the server-backed dialects, set explicitly so all three behave
-#: alike. PostgreSQL already defaults to this; MySQL/MariaDB default to REPEATABLE READ,
-#: where a session keeps serving the snapshot it started with and misses commits made by
-#: other requests in the meantime.
+#: Isolation level for the server-backed dialect, set explicitly rather than relied on.
+#: PostgreSQL already defaults to this; saying it out loud keeps the behaviour stable
+#: if another dialect is ever added back.
 ISOLATION_LEVEL = "READ COMMITTED"
 
 

@@ -72,7 +72,7 @@ on first start, so the browser will warn you once — that is expected, see
 Register, found a household, pass the join code to the people you live with. Whoever
 founds it is the admin.
 
-More ways to run it — MariaDB, PostgreSQL, a reverse proxy, your own certificate — are in
+More ways to run it — PostgreSQL, a reverse proxy, your own certificate — are in
 [docs/installation.md](docs/installation.md).
 
 ## Documentation
@@ -150,7 +150,7 @@ ruff check . && ruff format --check .
 ```
 
 The test suite runs against SQLite in memory; continuous integration additionally runs it
-against MariaDB and PostgreSQL, because the schema has to stay dialect-independent.
+against PostgreSQL, because the schema has to stay dialect-independent.
 
 A few conventions, in case they save you time:
 

@@ -78,7 +78,7 @@ Start sein eigenes Zertifikat, deshalb warnt der Browser einmal — das ist so g
 Registrieren, Haushalt gründen, den Beitrittscode an die Mitbewohner*innen weitergeben.
 Wer gründet, ist Administration.
 
-Weitere Betriebsarten — MariaDB, PostgreSQL, Reverse Proxy, eigenes Zertifikat — stehen in
+Weitere Betriebsarten — PostgreSQL, Reverse Proxy, eigenes Zertifikat — stehen in
 [docs/installation.md](docs/installation.md).
 
 ## Dokumentation
@@ -160,8 +160,8 @@ pytest
 ruff check . && ruff format --check .
 ```
 
-Die Testsuite läuft gegen SQLite im Arbeitsspeicher; die CI zusätzlich gegen MariaDB und
-PostgreSQL, weil das Schema dialektunabhängig bleiben muss.
+Die Testsuite läuft gegen SQLite im Arbeitsspeicher; die CI zusätzlich gegen PostgreSQL,
+weil das Schema dialektunabhängig bleiben muss.
 
 Ein paar Konventionen, falls sie dir Zeit sparen:
 

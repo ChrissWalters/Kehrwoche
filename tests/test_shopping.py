@@ -313,7 +313,7 @@ async def test_the_state_marker_changes_when_the_list_changes(founder: AsyncClie
 def test_the_marker_reacts_to_a_change_that_keeps_the_count(db_session: Session) -> None:
     """Ticking an item off changes nothing but its timestamp — the marker must notice.
 
-    The clock is moved by hand here: on MariaDB, which stores whole seconds only, add
+    The clock is moved by hand here rather than trusted: at second resolution, add
     and tick would otherwise fall into the same second.
     """
     household = Household(name="WG", join_code="GGGGHHHHJJJJ")

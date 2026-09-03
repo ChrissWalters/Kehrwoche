@@ -85,14 +85,19 @@ SQLite is the default and is not a compromise: one household writing occasionall
 inside what a single file and a single process do comfortably, and it is the only option
 with a backup command built into the application.
 
-Reach for a server database if you already run one, or if one instance serves many
-households. Both are tested against every change, so the schema is the same everywhere —
-PostgreSQL is the stronger engine, MariaDB the more familiar one on a NAS.
+Reach for PostgreSQL if you already run one, or if one instance serves many
+households. It is tested against every change, so the schema behaves the same as on
+SQLite.
+
+It is also the only external database supported, and that is deliberate: PostgreSQL
+applies migrations in a transaction and rolls a failed one back by itself. An update
+therefore cannot leave the schema half-changed — the same promise the SQLite copy
+makes, kept a different way.
 
 In `docker-compose.yml`:
 
-1. Uncomment the `DATABASE_URL` line for the database you want.
-2. Uncomment the matching `db:` service and the `db-data:` volume at the bottom.
+1. Uncomment the `DATABASE_URL` line.
+2. Uncomment the `db:` service and the `db-data:` volume at the bottom.
 3. Uncomment the `depends_on:` block, so the application waits for the database to be
    ready before it migrates.
 4. **Replace `CHANGE-ME`.** It is a placeholder, not a password.
@@ -169,15 +174,14 @@ or a password: nobody was able to send one.
 
 ### With an external database
 
-The container cannot back up a database it does not own — it ships no `mariadb-dump` and
-no `pg_dump`, and your server may be shared and large. So when a migration is due it says
-so in the log, names the dump command, and goes ahead.
+The container cannot back up a database it does not own — it ships no `pg_dump`, and
+your server may be shared and large. So when a migration is due it says so in the log,
+names the dump command, and goes ahead.
 
-* **PostgreSQL** applies all migrations in one transaction and rolls the whole thing back
-  by itself if one fails. The risk here is small.
-* **MariaDB/MySQL** does not: it commits each step as it goes. A migration that fails
-  half way leaves the schema between two versions, and a dump is the only way back.
-  **Take one before updating** — see [backup-restore.md](backup-restore.md).
+That is safe because PostgreSQL applies all migrations in one transaction and rolls the
+whole thing back by itself if one fails. Your database is either fully migrated or
+exactly as it was — never in between. A dump before a major update is still good
+practice, but nothing depends on you remembering it.
 
 ### When it refuses to start
 

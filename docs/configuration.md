@@ -13,7 +13,7 @@ readable message, rather than being silently ignored.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `DATABASE_URL` | `sqlite:////data/kehrwoche.db` | Where the data lives. SQLite, MariaDB/MySQL (`mysql+pymysql://…`) or PostgreSQL (`postgresql+psycopg://…`). |
+| `DATABASE_URL` | `sqlite:////data/kehrwoche.db` | Where the data lives. SQLite, or PostgreSQL (`postgresql+psycopg://…`). |
 | `DATA_DIR` | `/data` | The data volume: database file, uploaded pictures (`media/`), certificates (`tls/`). |
 | `TLS_MODE` | `self-signed` | `self-signed`, `custom` or `off`. See below. |
 | `TLS_CERT_FILE` | — | Certificate file, required for `TLS_MODE=custom`. |

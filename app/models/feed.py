@@ -63,9 +63,9 @@ class FeedEvent(Entity):
 
     #: Newest comment the author of this event has already seen; everything with a
     #: higher id is unread for them. Deliberately an id and not a timestamp: ids grow
-    #: strictly, while MariaDB stores whole seconds only and two comments in the same
-    #: second would be indistinguishable. Plain integer, no foreign key — a deleted
-    #: comment must not reset the mark.
+    #: strictly, while two comments written in the same instant can carry the same
+    #: timestamp. Plain integer, no foreign key — a deleted comment must not reset
+    #: the mark.
     comments_seen_id: Mapped[int | None] = mapped_column(Integer, default=None)
 
     household: Mapped[Household] = relationship(back_populates="feed_events")
