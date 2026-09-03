@@ -4,8 +4,8 @@ Stored as i18n keys plus parameters, never as finished text: everybody reads the
 notifications in their own language, and that language may change after the notification
 was written. Rendering happens on the client, at display time.
 
-The interface is deliberately channel agnostic, so web push can be added as a second delivery
-channel without touching a single caller.
+The interface is deliberately channel agnostic, so a future version can add web push as
+a second delivery channel without touching a single caller.
 """
 
 from __future__ import annotations

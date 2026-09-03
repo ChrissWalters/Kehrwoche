@@ -6,7 +6,7 @@ Create Date: 2026-08-06
 
 Migration 0004 copied the previous login name into both ``username`` and ``email`` so
 that nothing was lost. Login names are rarely addresses though ("jayw", "alex@wg"), and
-a field called ``email`` must not hold anything else — one day something will send mail
+a field called ``email`` must not hold anything else — a future version will send mail
 to it. Whatever does not look like an address is therefore cleared; the value survives
 as the username.
 """

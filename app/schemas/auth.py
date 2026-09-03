@@ -19,8 +19,8 @@ PASSWORD_MAX_LENGTH = 256
 class RegisterRequest(BaseModel):
     #: Freely chosen login name; it is visible to the household.
     username: str = Field(min_length=1, max_length=USERNAME_MAX_LENGTH)
-    #: Optional and private. Nothing is sent to it; it prepares a later password reset
-    #: by mail.
+    #: Optional and private. Nothing is sent to it yet; it prepares the password reset
+    #: by mail planned for a future version.
     email: str | None = Field(default=None, max_length=EMAIL_MAX_LENGTH)
     #: Policy checks (length, common passwords) happen in ``app.security``.
     password: str = Field(max_length=PASSWORD_MAX_LENGTH)
