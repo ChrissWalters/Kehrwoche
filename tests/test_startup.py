@@ -143,12 +143,17 @@ def test_the_image_leaves_internal_papers_outside() -> None:
         assert entry in ignored, entry
 
 
+#: The specification is a working document and is deliberately not published, so this
+#: check only has something to compare against on a machine that has it.
+SPECIFICATION = Path(".intern/spec.md")
+
+
+@pytest.mark.skipif(not SPECIFICATION.is_file(), reason="the specification is not published")
 def test_the_compose_file_matches_the_specification() -> None:
     """The specification prints the file; ours has to be that file."""
     import re
 
-    spec = Path(".intern/spec.md").read_text(encoding="utf-8")
-    blocks = re.findall(r"```yaml\n(.*?)```", spec, re.S)
+    blocks = re.findall(r"```yaml\n(.*?)```", SPECIFICATION.read_text(encoding="utf-8"), re.S)
     shipped = Path("docker-compose.yml").read_text(encoding="utf-8").strip()
 
     assert any(block.strip() == shipped for block in blocks), (

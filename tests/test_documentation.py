@@ -11,6 +11,7 @@ They deliberately check facts, not wording: names, links, files and versions.
 from __future__ import annotations
 
 import re
+import subprocess
 import tomllib
 from pathlib import Path
 
@@ -107,3 +108,77 @@ def test_the_release_workflow_publishes_only_from_a_tag() -> None:
 
     assert 'tags: ["v*"]' in workflow
     assert "branches:" not in workflow
+
+
+# --- What must never be published -----------------------------------------------------
+
+#: File names and suffixes that have no business in a public repository. Secret scanning
+#: at the forge catches known token formats; it knows nothing about a database somebody
+#: dropped in by accident, and that is the likelier mistake here.
+FORBIDDEN = (
+    ".intern",  # specification and plan — working documents
+    ".claude",  # working instructions and progress notes
+    ".venv",
+    "dev-data",
+    ".env",
+)
+FORBIDDEN_SUFFIXES = (".db", ".sqlite", ".sqlite3", ".key", ".pem", ".crt", ".p12", ".pfx")
+
+
+def tracked_files() -> list[str]:
+    """Everything git would publish, straight from git rather than from a guess."""
+    listing = subprocess.run(
+        ["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True
+    )
+    return listing.stdout.splitlines()
+
+
+def test_nothing_private_is_tracked() -> None:
+    """One commit is enough to put a secret in the history for good."""
+    offenders = [
+        path
+        for path in tracked_files()
+        if any(part in FORBIDDEN for part in Path(path).parts)
+        or Path(path).suffix.lower() in FORBIDDEN_SUFFIXES
+    ]
+
+    assert offenders == [], "these files must not be in a public repository"
+
+
+def test_no_tracked_file_carries_a_credential() -> None:
+    """A rough net for the shapes a leaked secret usually has."""
+    patterns = re.compile(
+        r"-----BEGIN [A-Z ]*PRIVATE KEY-----"
+        r"|ghp_[A-Za-z0-9]{36}"
+        r"|github_pat_[A-Za-z0-9_]{22,}"
+        r"|AKIA[0-9A-Z]{16}"
+        r"|xox[baprs]-[A-Za-z0-9-]{10,}"
+    )
+
+    offenders = []
+    for path in tracked_files():
+        full = ROOT / path
+        try:
+            text = full.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue  # binary, or gone in a dirty tree — neither is a credential
+        if patterns.search(text):
+            offenders.append(path)
+
+    assert offenders == [], "these files look like they carry a credential"
+
+
+def test_no_tracked_file_names_the_author_personally() -> None:
+    """Home directories and private addresses travel further than people expect."""
+    personal = re.compile(r"/home/[a-z]+/|chris@graf-sapp\.de")
+
+    offenders = []
+    for path in tracked_files():
+        try:
+            text = (ROOT / path).read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        if personal.search(text):
+            offenders.append(path)
+
+    assert offenders == [], "these files carry a personal path or address"
