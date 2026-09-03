@@ -23,11 +23,13 @@ BACKGROUND = (238, 238, 236)
 LINE = (170, 170, 166)
 TEXT = (90, 90, 88)
 
+#: Twice the viewport, the way a screenshot at a pixel ratio of 2 comes out — so a
+#: placeholder occupies the same space in the README as the picture replacing it.
 PLACEHOLDERS = [
-    ("mobile-chores.png", 360, 640, "Chores"),
-    ("mobile-shopping.png", 360, 640, "Shopping list"),
-    ("mobile-expenses.png", 360, 640, "Balances"),
-    ("desktop-feed.png", 1280, 800, "Pinboard (desktop)"),
+    ("mobile-chores.png", 824, 1830, "Chores"),
+    ("mobile-shopping.png", 824, 1830, "Shopping list"),
+    ("mobile-expenses.png", 824, 1830, "Balances"),
+    ("desktop-feed.png", 2560, 1600, "Pinboard (desktop)"),
 ]
 
 
